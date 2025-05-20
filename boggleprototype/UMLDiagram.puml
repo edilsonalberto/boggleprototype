@@ -1,0 +1,94 @@
+@startuml
+' UI Components
+package "componentUI" {
+  class GameplayHUD {
+    +create(stage: Stage): void
+  }
+
+  class LetterTileGrid
+
+  class TitleScreenComponents {
+    - stage: Stage
+    +TitleScreenComponents(stage: Stage)
+  }
+}
+
+package "interactable" {
+  abstract class BoggleButton {
+    - x: int
+    - y: int
+    - button: TextButton
+    - dimensionsW: int
+    - dimensionsH: int
+    +BoggleButton(x: int, y: int, w: int, h: int, style: TextButtonStyle)
+  }
+
+  class LetterTile {
+    - letter: char
+    +LetterTile(x: int, y: int, w: int, h: int, style: TextButtonStyle)
+  }
+
+  LetterTile --|> BoggleButton
+}
+
+package "logicUI" {
+  class LetterTileActionListener {
+    - tiles: ArrayList<LetterTile>
+    - pressedTiles: ArrayList<LetterTile>
+  }
+
+  class TitleScreenButtonActionListener
+
+  LetterTileActionListener --> LetterTile
+}
+
+package "stateUI" {
+  class MainGameplayState {
+    - stage: Stage
+    - lt: LetterTileGrid
+    +create(): void
+    +render(): void
+  }
+
+  class TitleScreenState {
+    - stage: Stage
+    - tsc: TitleScreenComponents
+    +create(): void
+    +render(): void
+  }
+
+  class UIContext {
+    - state: Game
+    +setState(state: Game): void
+    +renderState(): void
+  }
+
+  MainGameplayState --> LetterTileGrid
+  TitleScreenState --> TitleScreenComponents
+  UIContext --> Game
+}
+
+' Database Layer
+package "database" {
+  class Databaseloader <<static>> {
+    +loadToMyMemoryDB(): Connection
+  }
+
+  class WordChecker {
+    - connection: Connection
+    +WordChecker(db: Databaseloader)
+    +isValid(word: String): boolean
+  }
+
+  class WordCheckerTest {
+    +testDatabaseConnectionIsValid(): void
+    +testifCarIsValid(): void
+    +testifCrazyIsValid(): void
+    +testforInvalidWord(): void
+    +WordCaseInsensitive(): void
+  }
+
+  WordChecker --> Databaseloader : uses
+  WordCheckerTest --> WordChecker : tests
+}
+@enduml
